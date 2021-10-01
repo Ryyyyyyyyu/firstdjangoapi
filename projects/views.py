@@ -1,11 +1,10 @@
 import json
 
-from django.db.models import Q
 from django.http import JsonResponse
-from django.db import connection
 from django.views import View
+
 from .models import ProjectsModel
-from interfaces.models import InterfacesModel
+
 
 # Create your views here.
 
@@ -33,22 +32,45 @@ class ProjectsView(View):
             data = json.loads(request.body)
         except Exception as e:
             return JsonResponse({"msg": str(e)})
-        if not data.get('id').isdigit():
-            return JsonResponse({"class": f"{self.__class__}", "method": "post", "data": "项目id参数类型错误"})
         if data.get('id'):
+            if type(data.get('id')) == str and not data.get('id').isdigit():
+                return JsonResponse({"class": f"{self.__class__}", "method": "post", "data": "项目id参数类型错误"})
             objs = ProjectsModel.objects.filter(id=data.get('id'))
             if objs.count() > 0:
                 return JsonResponse({"class": f"{self.__class__}", "method": "post", "data": "项目id已存在"})
+        if not data.get('name') or not data.get('leader'):
+            return JsonResponse({"class": f"{self.__class__}", "method": "post", "data": "入参错误，请检查"})
+        elif len(data.get('name')) == 0 or len(data.get('name')) > 50 or len(data.get('leader')) == 0 or len(
+                data.get('leader')) > 20 or len(data.get('desc')) > 200:
+            return JsonResponse({"class": f"{self.__class__}", "method": "post", "data": "入参长度超过限制"})
 
         obj = ProjectsModel.objects.create(**data)
 
-        return JsonResponse({"class": f"{self.__class__}", "method": "post", "data": "创建id为{}的项目成功".format(obj.id)})
+        return JsonResponse({"class": f"{self.__class__}", "method": "post", "data": "创建项目成功"})
 
     def put(self, request):
-        return JsonResponse({"method": "put"})
+        try:
+            data = json.loads(request.body)
+        except Exception as e:
+            return JsonResponse({"msg": str(e)})
+        if data.get('id'):
+            if type(data.get('id')) == str and not data.get('id').isdigit():
+                return JsonResponse({"class": f"{self.__class__}", "method": "put", "data": "项目id参数类型错误"})
+            objs = ProjectsModel.objects.filter(id=data.get('id'))
+            if objs.count() == 0:
+                return JsonResponse({"class": f"{self.__class__}", "method": "put", "data": "项目id不存在"})
+        if not data.get('name') or not data.get('leader'):
+            return JsonResponse({"class": f"{self.__class__}", "method": "put", "data": "入参错误，请检查"})
+        elif len(data.get('name')) == 0 or len(data.get('name')) > 50 or len(data.get('leader')) == 0 or len(
+                data.get('leader')) > 20 or len(data.get('desc')) > 200:
+            return JsonResponse({"class": f"{self.__class__}", "method": "put", "data": "入参长度超过限制"})
+
+        obj = ProjectsModel.objects.update(**data)
+        return JsonResponse({"class": f"{self.__class__}", "method": "put", "data": "更新项目成功"})
 
     def delete(self, request):
-        return JsonResponse({"method": "delete"})
+        ProjectsModel.objects.all().delete()
+        return JsonResponse({"class": f"{self.__class__}", "method": "delete", "data": "删除所有项目成功"})
 
 
 class ProjectDetailsViews(View):
@@ -71,3 +93,7 @@ class ProjectDetailsViews(View):
 
     def post(self, request):
         return JsonResponse({"class": f"{self.__class__}", "method": "post"})
+
+    def delete(self, request, pk):
+        ProjectsModel.objects.filter(id=pk).delete()
+        return JsonResponse({"class": f"{self.__class__}", "method": "delete", "data": "项目删除成功"})
