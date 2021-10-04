@@ -82,10 +82,12 @@ class ProjectsView(View):
             objs = ProjectsModel.objects.filter(id=data.get('id'))
         except Exception as e:
             return JsonResponse({"class": f"{self.__class__}", "method": "put", "msg": str(e)}, status=400)
+        data.pop('id')
         ser = ProjectSerializer(data=data)
-        if ser.is_valid():
+        if not ser.is_valid():
             return JsonResponse({"class": f"{self.__class__}", "method": "put", "msg": ser.errors}, status=400)
-        objs.update(**ser.validated_data)
+        if objs.update(**ser.validated_data) == 0:
+            return JsonResponse({"class": f"{self.__class__}", "method": "put", "data": "项目id不存在"})
 
         return JsonResponse({"class": f"{self.__class__}", "method": "put", "data": "更新项目成功"})
 
@@ -115,11 +117,9 @@ class ProjectDetailsViews(View):
         #     return JsonResponse({"class": f"{self.__class__}", "method": "get", "data": data})
         # else:
         #     return JsonResponse({"class": f"{self.__class__}", "method": "get", "msg": "项目id不存在"})
-        ser = ProjectSerializer(instance=objs)
-        if ser.is_valid():
-            return JsonResponse({"class": f"{self.__class__}", "method": "get", "msg": ser.errors}, status=400)
-        objs.update(**ser.validated_data)
-        return JsonResponse({"class": f"{self.__class__}", "method": "get", "data": ''})
+        ser = ProjectSerializer(instance=objs, many=True)
+
+        return JsonResponse({"class": f"{self.__class__}", "method": "get", "data": ser.data})
 
     def post(self, request, pk):
         data: dict
@@ -132,7 +132,8 @@ class ProjectDetailsViews(View):
         ser = ProjectSerializer(data=data)
         if not ser.is_valid():
             return JsonResponse({"class": f"{self.__class__}", "method": "post", "msg": ser.errors}, status=400)
-
+        if ser.validated_data.get("id"):
+            return JsonResponse({"class": f"{self.__class__}", "method": "post", "msg": "该接口不需要添加id参数"}, status=400)
         ProjectsModel.objects.create(**ser.validated_data)
 
         return JsonResponse({"class": f"{self.__class__}", "method": "post", "data": "创建项目成功"}, status=201)
@@ -144,16 +145,22 @@ class ProjectDetailsViews(View):
         except Exception as e:
             return JsonResponse({"msg": str(e)})
 
+        # if objs.count() == 0:
+        #     return JsonResponse({"class": f"{self.__class__}", "method": "put", "data": "项目id不存在"})
+        # if not data.get('name') or not data.get('leader'):
+        #     return JsonResponse({"class": f"{self.__class__}", "method": "put", "data": "入参错误，请检查"})
+        # elif len(data.get('name')) == 0 or len(data.get('name')) > 50 or len(data.get('leader')) == 0 or len(
+        #         data.get('leader')) > 20 or len(data.get('desc')) > 200:
+        #     return JsonResponse({"class": f"{self.__class__}", "method": "put", "data": "入参长度超过限制"})
+        #
+        # obj = objs.update(**data)
         if objs.count() == 0:
             return JsonResponse({"class": f"{self.__class__}", "method": "put", "data": "项目id不存在"})
-        if not data.get('name') or not data.get('leader'):
-            return JsonResponse({"class": f"{self.__class__}", "method": "put", "data": "入参错误，请检查"})
-        elif len(data.get('name')) == 0 or len(data.get('name')) > 50 or len(data.get('leader')) == 0 or len(
-                data.get('leader')) > 20 or len(data.get('desc')) > 200:
-            return JsonResponse({"class": f"{self.__class__}", "method": "put", "data": "入参长度超过限制"})
-
-        obj = objs.update(**data)
-
+        ser = ProjectSerializer(data=data)
+        if not ser.is_valid():
+            return JsonResponse({"class": f"{self.__class__}", "method": "put", "msg": ser.errors}, status=400)
+        if ser.validated_data.get("id"):
+            return JsonResponse({"class": f"{self.__class__}", "method": "put", "msg": "该接口不需要添加id参数"}, status=400)
         return JsonResponse({"class": f"{self.__class__}", "method": "put", "data": "更新项目成功"})
 
     def delete(self, request, pk):
