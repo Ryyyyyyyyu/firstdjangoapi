@@ -4,7 +4,8 @@ from django.http import JsonResponse
 from django.views import View
 
 from .models import ProjectsModel
-from .serializers import ProjectSerializer
+
+from .serializers import ProjectSerializer, ProjectModelSerializer
 
 
 # Create your views here.
@@ -25,7 +26,9 @@ class ProjectsView(View):
         #         "update_time": obj.update_time
         #     }
         #     data_list.append(data)
-        ser = ProjectSerializer(instance=objs, many=True)
+
+        # ser = ProjectSerializer(instance=objs, many=True)
+        ser = ProjectModelSerializer(instance=objs, many=True)
 
         return JsonResponse({"class": f"{self.__class__}", "method": "get", "data": ser.data})
 
