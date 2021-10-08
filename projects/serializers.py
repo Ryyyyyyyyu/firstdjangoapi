@@ -3,7 +3,6 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 from .models import ProjectsModel
-from interfaces.models import InterfacesModel
 
 
 class ProjectSerializer(serializers.Serializer):
@@ -35,7 +34,9 @@ class InterfaceDataSerializer(serializers.Serializer):
 
 
 class ProjectModelSerializer(serializers.ModelSerializer):
-    interfacesmodel_set = InterfaceDataSerializer(read_only=True, many=True)
+    id = serializers.IntegerField(help_text='项目id', label='项目id', required=False, validators=[
+        UniqueValidator(queryset=ProjectsModel.objects.all(), message='项目id重复')])
+    interfacesmodel_set = InterfaceDataSerializer(help_text='项目接口信息', label='项目接口信息', read_only=True, many=True)
 
     # interfacesmodel_set = serializers.SerializerMethodField()
 
@@ -47,10 +48,10 @@ class ProjectModelSerializer(serializers.ModelSerializer):
         model = ProjectsModel
         fields = "__all__"
         extra_kwargs = {
-            'id': {
-                'required': 'False',
-                'validators': [UniqueValidator(queryset=ProjectsModel.objects.all(), message='项目id重复')]
-            },
+            # 'id': {
+            #     'required': 'False',
+            #     'validators': [UniqueValidator(queryset=ProjectsModel.objects.all(), message='项目id重复')]
+            # },
             'name': {
                 'required': 'True',
                 'error_messages': {

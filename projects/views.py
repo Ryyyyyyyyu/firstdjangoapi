@@ -1,7 +1,9 @@
 import json
 
 from django.http import JsonResponse
+from rest_framework.response import Response
 from django.views import View
+from rest_framework.views import APIView
 
 from .models import ProjectsModel
 
@@ -9,12 +11,11 @@ from .serializers import ProjectSerializer, ProjectModelSerializer
 
 
 # Create your views here.
-
-
-class ProjectsView(View):
+# class ProjectsView(View):
+class ProjectsView(APIView):
 
     def get(self, request):
-        objs = ProjectsModel.objects.all()
+        queryset = ProjectsModel.objects.all()
         # data_list = []
         # for obj in objs:
         #     obj: ProjectsModel
@@ -28,16 +29,17 @@ class ProjectsView(View):
         #     data_list.append(data)
 
         # ser = ProjectSerializer(instance=objs, many=True)
-        ser = ProjectModelSerializer(instance=objs, many=True)
+        serializer = ProjectModelSerializer(instance=queryset, many=True)
 
-        return JsonResponse({"class": f"{self.__class__}", "method": "get", "data": ser.data})
+        # return JsonResponse({"class": f"{self.__class__}", "method": "get", "data": ser.data})
+        return Response({"class": f"{self.__class__}", "method": "get", "data": serializer.data})
 
     def post(self, request):
-        data: dict
-        try:
-            data = json.loads(request.body)
-        except Exception as e:
-            return JsonResponse({"msg": str(e)})
+        # data: dict
+        # try:
+        #     data = json.loads(request.body)
+        # except Exception as e:
+        #     return JsonResponse({"msg": str(e)})
         # if data.get('id'):
         #     if type(data.get('id')) == str and not data.get('id').isdigit():
         #         return JsonResponse({"class": f"{self.__class__}", "method": "post", "data": "项目id参数类型错误"})
@@ -51,20 +53,22 @@ class ProjectsView(View):
         #     return JsonResponse({"class": f"{self.__class__}", "method": "post", "data": "入参长度超过限制"})
 
         # obj = ProjectsModel.objects.create(**data)
-        ser = ProjectModelSerializer(data=data)
-        if not ser.is_valid():
-            return JsonResponse({"class": f"{self.__class__}", "method": "post", "msg": ser.errors}, status=400)
+        serializer = ProjectModelSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({"class": f"{self.__class__}", "method": "post", "msg": serializer.errors})
+            # return JsonResponse({"class": f"{self.__class__}", "method": "post", "msg": serializer.errors},
+            # status=400)
 
         # obj = ProjectsModel.objects.create(**ser.validated_data)
-        ser.save()
+        serializer.save()
 
-        return JsonResponse({"class": f"{self.__class__}", "method": "post", "data": "创建项目成功"}, status=201)
+        return Response({"class": f"{self.__class__}", "method": "post", "data": "创建项目成功"}, status=201)
 
     def put(self, request):
-        try:
-            data = json.loads(request.body)
-        except Exception as e:
-            return JsonResponse({"msg": str(e)})
+        # try:
+        #     data = json.loads(request.body)
+        # except Exception as e:
+        #     return JsonResponse({"msg": str(e)})
         # if data.get('id'):
         #     if type(data.get('id')) == str and not data.get('id').isdigit():
         #         return JsonResponse({"class": f"{self.__class__}", "method": "put", "data": "项目id参数类型错误"})
@@ -83,21 +87,22 @@ class ProjectsView(View):
         # else:
         #     return JsonResponse({"class": f"{self.__class__}", "method": "put", "data": "项目id必传"})
         try:
-            objs = ProjectsModel.objects.filter(id=data.get('id'))
+            objs = ProjectsModel.objects.filter(id=request.data.get('id'))
+            # request.data.pop('id')
         except Exception as e:
-            return JsonResponse({"class": f"{self.__class__}", "method": "put", "msg": str(e)}, status=400)
-        data.pop('id')
-        ser = ProjectModelSerializer(data=data)
+            return Response({"class": f"{self.__class__}", "method": "put", "msg": str(e)}, status=400)
+        if objs.count() == 0:
+            return Response({"class": f"{self.__class__}", "method": "put", "data": "项目id不存在"})
+        ser = ProjectModelSerializer(instance=objs.first(), data=request.data)
         if not ser.is_valid():
-            return JsonResponse({"class": f"{self.__class__}", "method": "put", "msg": ser.errors}, status=400)
-        if objs.update(**ser.validated_data) == 0:
-            return JsonResponse({"class": f"{self.__class__}", "method": "put", "data": "项目id不存在"})
+            return Response({"class": f"{self.__class__}", "method": "put", "msg": ser.errors}, status=400)
+        ser.save()
 
-        return JsonResponse({"class": f"{self.__class__}", "method": "put", "data": "更新项目成功"})
+        return Response({"class": f"{self.__class__}", "method": "put", "data": "更新项目成功"})
 
     def delete(self, request):
         ProjectsModel.objects.all().delete()
-        return JsonResponse({"class": f"{self.__class__}", "method": "delete", "data": "删除所有项目成功"})
+        return Response({"class": f"{self.__class__}", "method": "delete", "data": "删除所有项目成功"})
 
 
 class ProjectDetailsViews(View):
@@ -159,9 +164,9 @@ class ProjectDetailsViews(View):
         #     return JsonResponse({"class": f"{self.__class__}", "method": "put", "data": "入参长度超过限制"})
         #
         # obj = objs.update(**data)
+        ser = ProjectModelSerializer(instance=objs.first(), data=data)
         if objs.count() == 0:
             return JsonResponse({"class": f"{self.__class__}", "method": "put", "data": "项目id不存在"})
-        ser = ProjectModelSerializer(data=data)
         if not ser.is_valid():
             return JsonResponse({"class": f"{self.__class__}", "method": "put", "msg": ser.errors}, status=400)
         if ser.validated_data.get("id"):
