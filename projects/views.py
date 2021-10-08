@@ -51,11 +51,12 @@ class ProjectsView(View):
         #     return JsonResponse({"class": f"{self.__class__}", "method": "post", "data": "入参长度超过限制"})
 
         # obj = ProjectsModel.objects.create(**data)
-        ser = ProjectSerializer(data=data)
+        ser = ProjectModelSerializer(data=data)
         if not ser.is_valid():
             return JsonResponse({"class": f"{self.__class__}", "method": "post", "msg": ser.errors}, status=400)
 
-        obj = ProjectsModel.objects.create(**ser.validated_data)
+        # obj = ProjectsModel.objects.create(**ser.validated_data)
+        ser.save()
 
         return JsonResponse({"class": f"{self.__class__}", "method": "post", "data": "创建项目成功"}, status=201)
 
@@ -86,7 +87,7 @@ class ProjectsView(View):
         except Exception as e:
             return JsonResponse({"class": f"{self.__class__}", "method": "put", "msg": str(e)}, status=400)
         data.pop('id')
-        ser = ProjectSerializer(data=data)
+        ser = ProjectModelSerializer(data=data)
         if not ser.is_valid():
             return JsonResponse({"class": f"{self.__class__}", "method": "put", "msg": ser.errors}, status=400)
         if objs.update(**ser.validated_data) == 0:
@@ -120,7 +121,7 @@ class ProjectDetailsViews(View):
         #     return JsonResponse({"class": f"{self.__class__}", "method": "get", "data": data})
         # else:
         #     return JsonResponse({"class": f"{self.__class__}", "method": "get", "msg": "项目id不存在"})
-        ser = ProjectSerializer(instance=objs, many=True)
+        ser = ProjectModelSerializer(instance=objs, many=True)
 
         return JsonResponse({"class": f"{self.__class__}", "method": "get", "data": ser.data})
 
@@ -132,12 +133,13 @@ class ProjectDetailsViews(View):
             return JsonResponse({"msg": str(e)}, status=400)
         if ProjectsModel.objects.filter(id=pk).count() > 0:
             return JsonResponse({"class": f"{self.__class__}", "method": "post", "msg": "项目id已存在"}, status=400)
-        ser = ProjectSerializer(data=data)
+        ser = ProjectModelSerializer(data=data)
         if not ser.is_valid():
             return JsonResponse({"class": f"{self.__class__}", "method": "post", "msg": ser.errors}, status=400)
         if ser.validated_data.get("id"):
             return JsonResponse({"class": f"{self.__class__}", "method": "post", "msg": "该接口不需要添加id参数"}, status=400)
-        ProjectsModel.objects.create(**ser.validated_data)
+        # ProjectsModel.objects.create(**ser.validated_data)
+        ser.save()
 
         return JsonResponse({"class": f"{self.__class__}", "method": "post", "data": "创建项目成功"}, status=201)
 
@@ -159,11 +161,12 @@ class ProjectDetailsViews(View):
         # obj = objs.update(**data)
         if objs.count() == 0:
             return JsonResponse({"class": f"{self.__class__}", "method": "put", "data": "项目id不存在"})
-        ser = ProjectSerializer(data=data)
+        ser = ProjectModelSerializer(data=data)
         if not ser.is_valid():
             return JsonResponse({"class": f"{self.__class__}", "method": "put", "msg": ser.errors}, status=400)
         if ser.validated_data.get("id"):
             return JsonResponse({"class": f"{self.__class__}", "method": "put", "msg": "该接口不需要添加id参数"}, status=400)
+        ser.save()
         return JsonResponse({"class": f"{self.__class__}", "method": "put", "data": "更新项目成功"})
 
     def delete(self, request, pk):

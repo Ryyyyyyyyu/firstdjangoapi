@@ -28,7 +28,6 @@ class ProjectSerializer(serializers.Serializer):
     #                                                          many=True)
 
 
-
 class InterfaceDataSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
@@ -60,5 +59,7 @@ class ProjectModelSerializer(serializers.ModelSerializer):
                     'allow_null': '项目名称不能为null'
                 },
                 'validators': [UniqueValidator(queryset=ProjectsModel.objects.all(), message='项目名称重复')]
-            }
+            },
+            'create_time': {'format': '%Y-%m-%d %H:%M:%S'},
+            'update_time': {'format': '%Y-%m-%d %H:%M:%S'}
         }
