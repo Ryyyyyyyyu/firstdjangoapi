@@ -134,4 +134,12 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
     ],
+    # 全局定义过滤引擎类
+    'DEFAULT_FILTER_BACKENDS': ['rest_framework.filters.SearchFilter', 'rest_framework.filters.OrderingFilter'],
+    # Pagination
+    'PAGE_SIZE': None,
+
+    # Filtering
+    'SEARCH_PARAM': 'search',
+    'ORDERING_PARAM': 'ordering',
 }
