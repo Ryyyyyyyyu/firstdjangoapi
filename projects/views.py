@@ -18,11 +18,17 @@ from .serializers import ProjectModelSerializer
 class ProjectsView(GenericAPIView):
     queryset = ProjectsModel.objects.all()
     serializer_class = ProjectModelSerializer
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['id', 'name']
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['=id', '^name']
+    ordering_fields = ['id']
 
     def get(self, request):
         queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(instance=page, many=True)
+            return self.get_paginated_response(serializer.data)
+
         serializer = self.get_serializer(instance=queryset, many=True)
         return Response({"class": f"{self.__class__}", "method": "get", "data": serializer.data})
 

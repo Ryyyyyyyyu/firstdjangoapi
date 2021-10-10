@@ -136,8 +136,9 @@ REST_FRAMEWORK = {
     ],
     # 全局定义过滤引擎类
     'DEFAULT_FILTER_BACKENDS': ['rest_framework.filters.SearchFilter', 'rest_framework.filters.OrderingFilter'],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     # Pagination
-    'PAGE_SIZE': None,
+    'PAGE_SIZE': 3,
 
     # Filtering
     'SEARCH_PARAM': 'search',
