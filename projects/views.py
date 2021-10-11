@@ -5,10 +5,11 @@ from rest_framework.response import Response
 from django.views import View
 from rest_framework.views import APIView
 from rest_framework import filters
+from django_filters import rest_framework
 from rest_framework.generics import GenericAPIView
 
 from .models import ProjectsModel
-
+from .filters import ProjectsFilterSet
 from .serializers import ProjectModelSerializer
 
 
@@ -18,8 +19,9 @@ from .serializers import ProjectModelSerializer
 class ProjectsView(GenericAPIView):
     queryset = ProjectsModel.objects.all()
     serializer_class = ProjectModelSerializer
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['=id', '^name']
+    filter_backends = [rest_framework.DjangoFilterBackend, filters.OrderingFilter]
+    filter_class = ProjectsFilterSet
+    search_fields = ['id', 'name']
     ordering_fields = ['id']
 
     def get(self, request):
