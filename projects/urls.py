@@ -9,4 +9,13 @@ urlpatterns = [
 
     path('projectsdetail/', views.ProjectsView.as_view()),
     path('projectsdetail/<int:pk>/', views.ProjectDetailsViews.as_view()),
+    path('projectset/', views.ProjectViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })),
+    path('projectset/<int:pk>/', views.ProjectViewSet.as_view({
+        'get': 'retrieve',
+        'put': 'update',
+        'delete': 'destroy'
+    })),
 ]

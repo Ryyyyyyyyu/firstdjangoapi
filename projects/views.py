@@ -1,7 +1,8 @@
 from django_filters import rest_framework
 from rest_framework import filters
+from rest_framework import generics
 from rest_framework import mixins
-from rest_framework.generics import GenericAPIView
+from rest_framework import viewsets
 from rest_framework.response import Response
 
 from .filters import ProjectsFilterSet
@@ -12,7 +13,8 @@ from .serializers import ProjectModelSerializer
 # Create your views here.
 # class ProjectsView(View):
 # class ProjectsView(APIView):
-class ProjectsView(mixins.CreateModelMixin, mixins.ListModelMixin, GenericAPIView):
+# class ProjectsView(mixins.CreateModelMixin, mixins.ListModelMixin, GenericAPIView):
+class ProjectsView(generics.ListCreateAPIView):
     queryset = ProjectsModel.objects.all()
     serializer_class = ProjectModelSerializer
     filter_backends = [rest_framework.DjangoFilterBackend, filters.OrderingFilter]
@@ -60,7 +62,8 @@ class ProjectsView(mixins.CreateModelMixin, mixins.ListModelMixin, GenericAPIVie
         return Response({"class": f"{self.__class__}", "method": "delete", "data": "删除所有项目成功"})
 
 
-class ProjectDetailsViews(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, GenericAPIView):
+# class ProjectDetailsViews(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, GenericAPIView):
+class ProjectDetailsViews(generics.RetrieveUpdateDestroyAPIView):
     queryset = ProjectsModel.objects.all()
     serializer_class = ProjectModelSerializer
 
@@ -103,3 +106,14 @@ class ProjectDetailsViews(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mi
     #     return Response({"class": f"{self.__class__}", "method": "delete", "data": "项目删除成功"})
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
+
+
+# class ProjectViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
+#                      mixins.DestroyModelMixin, viewsets.ViewSet):
+class ProjectViewSet(viewsets.ModelViewSet):
+    queryset = ProjectsModel.objects.all()
+    serializer_class = ProjectModelSerializer
+    filter_backends = [rest_framework.DjangoFilterBackend, filters.OrderingFilter]
+    filter_class = ProjectsFilterSet
+    search_fields = ['id', 'name']
+    ordering_fields = ['id']
