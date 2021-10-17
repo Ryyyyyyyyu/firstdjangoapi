@@ -4,16 +4,13 @@ from rest_framework import generics
 from rest_framework import mixins
 from rest_framework import viewsets
 from rest_framework.response import Response
+from rest_framework.decorators import action
 
 from .filters import ProjectsFilterSet
 from .models import ProjectsModel
 from .serializers import ProjectModelSerializer
 
 
-# Create your views here.
-# class ProjectsView(View):
-# class ProjectsView(APIView):
-# class ProjectsView(mixins.CreateModelMixin, mixins.ListModelMixin, GenericAPIView):
 class ProjectsView(generics.ListCreateAPIView):
     queryset = ProjectsModel.objects.all()
     serializer_class = ProjectModelSerializer
@@ -21,27 +18,6 @@ class ProjectsView(generics.ListCreateAPIView):
     filter_class = ProjectsFilterSet
     search_fields = ['id', 'name']
     ordering_fields = ['id']
-
-    # def get(self, request):
-    #     queryset = self.filter_queryset(self.get_queryset())
-    #     page = self.paginate_queryset(queryset)
-    #     if page is not None:
-    #         serializer = self.get_serializer(instance=page, many=True)
-    #         return self.get_paginated_response(serializer.data)
-    #
-    #     serializer = self.get_serializer(instance=queryset, many=True)
-    #     return Response({"class": f"{self.__class__}", "method": "get", "data": serializer.data})
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
-    # def post(self, request):
-    #     serializer = self.get_serializer(data=request.data)
-    #     if not serializer.is_valid():
-    #         return Response({"class": f"{self.__class__}", "method": "post", "msg": serializer.errors})
-    #     serializer.save()
-    #     return Response({"class": f"{self.__class__}", "method": "post", "data": "创建项目成功"}, status=201)
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
 
     def put(self, request):
         try:
@@ -62,17 +38,9 @@ class ProjectsView(generics.ListCreateAPIView):
         return Response({"class": f"{self.__class__}", "method": "delete", "data": "删除所有项目成功"})
 
 
-# class ProjectDetailsViews(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, GenericAPIView):
 class ProjectDetailsViews(generics.RetrieveUpdateDestroyAPIView):
     queryset = ProjectsModel.objects.all()
     serializer_class = ProjectModelSerializer
-
-    # def get(self, request, *args, **kwargs):
-    #     instance = self.get_object()
-    #     serializer = self.serializer_class(instance=instance)
-    #     return Response({"class": f"{self.__class__}", "method": "get", "data": serializer.data})
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         data = request.data
@@ -83,33 +51,7 @@ class ProjectDetailsViews(generics.RetrieveUpdateDestroyAPIView):
         serializer.save()
         return Response({"class": f"{self.__class__}", "method": "post", "data": "创建项目成功"}, status=201)
 
-    # def put(self, request, *args, **kwargs):
-    #     try:
-    #         objs = self.get_object()
-    #     except Exception as e:
-    #         return Response({"msg": str(e)})
-    #
-    #     serializer = self.get_serializer(instance=objs, data=request.data)
-    #     if not serializer.is_valid():
-    #         return Response({"class": f"{self.__class__}", "method": "put", "msg": serializer.errors}, status=400)
-    #     if serializer.validated_data.get("id"):
-    #         return Response({"class": f"{self.__class__}", "method": "put", "msg": "该接口不需要添加id参数"}, status=400)
-    #     serializer.save()
-    #     return Response({"class": f"{self.__class__}", "method": "put", "data": "更新项目成功"})
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
 
-    # def delete(self, request, pk):
-    #     result = self.get_object().delete()
-    #     if result[0] == 0:
-    #         return Response({"class": f"{self.__class__}", "method": "delete", "data": "项目不存在"})
-    #     return Response({"class": f"{self.__class__}", "method": "delete", "data": "项目删除成功"})
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
-
-
-# class ProjectViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
-#                      mixins.DestroyModelMixin, viewsets.ViewSet):
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = ProjectsModel.objects.all()
     serializer_class = ProjectModelSerializer
@@ -117,3 +59,16 @@ class ProjectViewSet(viewsets.ModelViewSet):
     filter_class = ProjectsFilterSet
     search_fields = ['id', 'name']
     ordering_fields = ['id']
+
+    @action(detail=False)
+    def names(self, request, *args, **kwargs):
+        instance = self.get_queryset()
+
+        return Response([{'id': project.id, 'name': project.name} for project in instance])
+
+    @action(methods=['get'], detail=True)
+    def interfaces(self, request, *args, **kwargs):
+        project = self.get_object()
+        interfaces_qs = project.interfacesmodel_set.all()
+        interfaces_data = [{'id': interface.id, 'name': interface.name} for interface in interfaces_qs]
+        return Response(interfaces_data, status=200)
