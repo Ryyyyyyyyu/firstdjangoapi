@@ -5,6 +5,7 @@ from rest_framework import mixins
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework import permissions
 
 from .filters import ProjectsFilterSet
 from .models import ProjectsModel
@@ -59,6 +60,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
     filter_class = ProjectsFilterSet
     search_fields = ['id', 'name']
     ordering_fields = ['id']
+
+    permission_classes = [permissions.IsAuthenticated]
 
     @action(detail=False)
     def names(self, request, *args, **kwargs):

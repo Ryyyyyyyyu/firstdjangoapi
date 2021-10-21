@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
+import datetime
 import os
 from pathlib import Path
 
@@ -42,6 +43,7 @@ INSTALLED_APPS = [
     # 子应用注册
     'projects.apps.ProjectsConfig',
     'interfaces',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -125,6 +127,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# REST_FRAMEWORK相关配置
 REST_FRAMEWORK = {
     # 解析器
     'DEFAULT_PARSER_CLASSES': [
@@ -137,7 +140,7 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.BrowsableAPIRenderer',
     ],
     # 全局定义过滤引擎类
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend',
+    'DEFAULT_FILTER_BACKENDS': ['rest_framework.filters.SearchFilter',
                                 'rest_framework.filters.OrderingFilter'],
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'DEFAULT_PAGINATION_CLASS': 'utils.pagination.PageNumberPagination',
@@ -150,15 +153,24 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
 
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication'
     ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
+    # 'DEFAULT_PERMISSION_CLASSES': [
+    #     'rest_framework.permissions.IsAuthenticated',
+    # ],
 }
 
+# JWT_AUTH认证授权相关配置
+JWT_AUTH = {
+    # 过期时间 1天
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=1),
+    'JWT_RESPONSE_PAYLOAD_HANDLER':
+    'utils.handler_jwt_response.jwt_response_payload_handler',
+}
 
+# 日志相关配置
 LOGGING = {
     # 指定日志版本
     'version': 1,

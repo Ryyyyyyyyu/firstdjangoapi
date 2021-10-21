@@ -17,6 +17,7 @@ from django.urls import path, include, re_path
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework.documentation import include_docs_urls
+from rest_framework_jwt.views import obtain_jwt_token
 
 # swager文档
 schema_view = get_schema_view(
@@ -30,10 +31,13 @@ schema_view = get_schema_view(
     ),
     public=True,
 )
+
 urlpatterns = [
     # path('admin/', admin.site.urls),
     path('projects/', include('projects.urls')),
     path('interfaces/', include('interfaces.urls')),
+    path('user/', include('users.urls')),
+
     path('docs/', include_docs_urls(title="测试平台API文档")),
     re_path(r'^swagger(?P<format>\.json|\.yaml)$',
             schema_view.without_ui(cache_timeout=0), name='schema-json'),
