@@ -11,10 +11,14 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 import datetime
 import os
+import sys
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# 将apps目录加入到系统路径
+sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -39,22 +43,38 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'drf_yasg',
+    'corsheaders',
 
     # 子应用注册
     'projects.apps.ProjectsConfig',
     'interfaces',
     'users',
+    'testsuites',
+    'testcases',
+    'configures',
+    'reports',
+    'debugtalks',
+    'envs',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    # 解决跨域中间件,必须放在CommonMiddleware之前
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# 添加允许跨域的域名访问
+CORS_ORIGIN_ALLOW_ALL = True
+
+# CORS_ORIGIN_WHITELIST = [
+#     'http://127.0.0.1:8000',
+# ]
 
 ROOT_URLCONF = 'firstdjangoapi.urls'
 

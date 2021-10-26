@@ -7,9 +7,9 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import permissions
 
-from .filters import ProjectsFilterSet
-from .models import ProjectsModel
-from .serializers import ProjectModelSerializer
+from apps.projects.filters import ProjectsFilterSet
+from apps.projects.models import ProjectsModel
+from apps.projects.serializers import ProjectModelSerializer
 
 
 class ProjectsView(generics.ListCreateAPIView):

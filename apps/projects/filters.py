@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 from django_filters import FilterSet, filters
 
-from . import models
+from apps.projects import models
 
 
 class ProjectsFilterSet(FilterSet):
