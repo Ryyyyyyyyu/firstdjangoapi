@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     'corsheaders',
 
     # 子应用注册
-    'projects.apps.ProjectsConfig',
+    'projects',
     'interfaces',
     'users',
     'testsuites',

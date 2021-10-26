@@ -2,7 +2,7 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from apps.projects.models import ProjectsModel
+from projects.models import ProjectsModel
 
 
 class ProjectSerializer(serializers.Serializer):

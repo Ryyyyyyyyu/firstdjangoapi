@@ -1,7 +1,7 @@
 import json
 from django.views import View
 from django.http import JsonResponse
-from apps.interfaces.models import InterfacesModel
+from interfaces.models import InterfacesModel
 # Create your views here.
 
 

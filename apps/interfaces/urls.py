@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 from django.urls import path, re_path
-from apps.interfaces import views
+from interfaces import views
 
 
 urlpatterns = [
