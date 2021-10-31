@@ -12,7 +12,7 @@ class PageNumberPagination(_PageNumberPagination):
     """
     # The default page size.
     # Defaults to `None`, meaning pagination is disabled.
-    page_size = 5
+    page_size = 10
 
     # Client can control the page using this query parameter.
     page_query_param = 'page'
@@ -29,3 +29,8 @@ class PageNumberPagination(_PageNumberPagination):
 
     invalid_page_message = 'Invalid page.'
 
+    def get_paginated_response(self, data):
+        response = super().get_paginated_response(data)
+        response.data['current_page_num'] = self.page.number
+        response.data['total_pages'] = self.page.paginator.num_pages
+        return response

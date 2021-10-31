@@ -11,7 +11,7 @@ class ReportsModel(models.Model):
     success = models.IntegerField('成功总数', help_text='成功总数')
     html = models.TextField('报告HTML源码', help_text='报告HTML源码', null=True, blank=True, default='')
     summary = models.TextField('报告详情', help_text='报告详情', null=True, blank=True, default='')
-    is_valid = models.BooleanField(verbose_name='是否有效', help_text='是否删除', default=True)
+    is_valid = models.BooleanField(verbose_name='是否有效', help_text='是否有效', default=True)
     is_delete = models.BooleanField(verbose_name='是否删除', help_text='是否删除', default=False)
     create_time = models.DateTimeField(verbose_name='创建时间', help_text='创建时间', auto_now_add=True)
     update_time = models.DateTimeField(verbose_name='更新时间', help_text='创建时间', auto_now=True)

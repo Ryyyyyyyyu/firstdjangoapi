@@ -3,55 +3,19 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 from projects.models import ProjectsModel
-
-
-class ProjectSerializer(serializers.Serializer):
-    id = serializers.IntegerField(help_text='项目id', label='项目id', required=False, validators=[
-        UniqueValidator(queryset=ProjectsModel.objects.all(), message='项目id重复')])
-    name = serializers.CharField(help_text='项目名称', label='项目名称', max_length=50, min_length=0, required=True,
-                                 error_messages={
-                                     'max_length': '项目名称最大为50个字符',
-                                     'min_length': '项目名称不能为空',
-                                     'allow_null': '项目名称不能为null'
-                                 },
-                                 validators=[UniqueValidator(queryset=ProjectsModel.objects.all(), message='项目名称重复')])
-    leader = serializers.CharField(help_text='项目负责人', label='项目负责人', max_length=20,
-                                   error_messages={
-                                       'max_length': '项目负责人最大为20个字符'
-                                   })
-    desc = serializers.CharField(help_text='项目描述', label='项目描述', max_length=200, allow_null=True, allow_blank=True,
-                                 required=False)
-    create_time = serializers.DateTimeField(help_text='创建时间', label='创建时间', read_only=True, format='%Y-%m-%d %H:%M:%S')
-    update_time = serializers.DateTimeField(help_text='更新时间', label='更新时间', read_only=True, format='%Y-%m-%d %H:%M:%S')
-    # interfacesmodel_set = serializers.PrimaryKeyRelatedField(help_text='项目所属接口', label='项目所属接口', read_only=True,
-    #                                                          many=True)
-
-
-class InterfaceDataSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    name = serializers.CharField()
-    tester = serializers.CharField()
+from debugtalks.models import DebugtalksModel
+from interfaces.serializers import InterfacesNameSerializer
 
 
 class ProjectModelSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(help_text='项目id', label='项目id', required=False, validators=[
+    id = serializers.IntegerField(help_text='项目id', label='项目id', read_only=True, validators=[
         UniqueValidator(queryset=ProjectsModel.objects.all(), message='项目id重复')])
-    interfacesmodel_set = InterfaceDataSerializer(help_text='项目接口信息', label='项目接口信息', read_only=True, many=True)
-
-    # interfacesmodel_set = serializers.SerializerMethodField()
-
-    # def get_interfacesmodel_set(self, obj):
-    #     interfaces_query_set = obj.interfacesmodel_set.all()
-    #     return [{'id': interface_obj.id, 'name': interface_obj.name} for interface_obj in interfaces_query_set]
 
     class Meta:
         model = ProjectsModel
-        fields = "__all__"
+        # fields = "__all__"
+        exclude = ['is_delete']
         extra_kwargs = {
-            # 'id': {
-            #     'required': 'False',
-            #     'validators': [UniqueValidator(queryset=ProjectsModel.objects.all(), message='项目id重复')]
-            # },
             'name': {
                 'required': 'True',
                 'error_messages': {
@@ -64,3 +28,23 @@ class ProjectModelSerializer(serializers.ModelSerializer):
             'create_time': {'format': '%Y-%m-%d %H:%M:%S'},
             'update_time': {'format': '%Y-%m-%d %H:%M:%S'}
         }
+
+    def create(self, validated_data):
+        instance = super().create(validated_data)
+        DebugtalksModel.objects.create(project=instance)
+        return instance
+
+
+class ProjectNameSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ProjectsModel
+        fields = ['id', 'name']
+
+
+class ProjectInterfaceSerializer(serializers.ModelSerializer):
+    interfaces = InterfacesNameSerializer(help_text='项目接口信息', label='项目接口信息', read_only=True, many=True)
+
+    class Meta:
+        model = ProjectsModel
+        fields = ['interfaces']

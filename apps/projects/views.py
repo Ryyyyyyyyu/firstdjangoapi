@@ -1,59 +1,44 @@
 from django_filters import rest_framework
 from rest_framework import filters
-from rest_framework import generics
-from rest_framework import mixins
-from rest_framework import viewsets
-from rest_framework.response import Response
-from rest_framework.decorators import action
 from rest_framework import permissions
+from rest_framework import viewsets
+from rest_framework.decorators import action
 
+from configures.models import ConfiguresModel
+from interfaces.models import InterfacesModel
 from projects.filters import ProjectsFilterSet
 from projects.models import ProjectsModel
-from projects.serializers import ProjectModelSerializer
-
-
-class ProjectsView(generics.ListCreateAPIView):
-    queryset = ProjectsModel.objects.all()
-    serializer_class = ProjectModelSerializer
-    filter_backends = [rest_framework.DjangoFilterBackend, filters.OrderingFilter]
-    filter_class = ProjectsFilterSet
-    search_fields = ['id', 'name']
-    ordering_fields = ['id']
-
-    def put(self, request):
-        try:
-            objs = self.get_queryset().filter(id=request.data.get('id'))
-        except Exception as e:
-            return Response({"class": f"{self.__class__}", "method": "put", "msg": str(e)}, status=400)
-        if objs.count() == 0:
-            return Response({"class": f"{self.__class__}", "method": "put", "data": "项目id不存在"})
-        serializer = self.get_serializer(instance=objs.first(), data=request.data)
-        if not serializer.is_valid():
-            return Response({"class": f"{self.__class__}", "method": "put", "msg": serializer.errors}, status=400)
-        serializer.save()
-
-        return Response({"class": f"{self.__class__}", "method": "put", "data": "更新项目成功"})
-
-    def delete(self, request):
-        self.get_queryset().delete()
-        return Response({"class": f"{self.__class__}", "method": "delete", "data": "删除所有项目成功"})
-
-
-class ProjectDetailsViews(generics.RetrieveUpdateDestroyAPIView):
-    queryset = ProjectsModel.objects.all()
-    serializer_class = ProjectModelSerializer
-
-    def post(self, request, *args, **kwargs):
-        data = request.data
-        data['id'] = kwargs['pk']
-        serializer = self.serializer_class(data=data)
-        if not serializer.is_valid():
-            return Response({"class": f"{self.__class__}", "method": "post", "msg": serializer.errors}, status=400)
-        serializer.save()
-        return Response({"class": f"{self.__class__}", "method": "post", "data": "创建项目成功"}, status=201)
+from projects.serializers import ProjectModelSerializer, ProjectNameSerializer, ProjectInterfaceSerializer
+from testcases.models import TestcasesModel
+from testsuites.models import TestsuitsModel
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
+    """
+    list:
+    获取所有项目列表数据，默认分页
+
+    create:
+    创建项目
+
+    read:
+    获取具体某个项目信息
+
+    update:
+    更新某个项目信息（全部）
+
+    partial_update:
+    更新某个项目信息（部分）
+
+    delete:
+    删除项目
+
+    name:
+    获取所有项目id和名称，不分页
+
+    interfaces:
+    获取项目包含的接口名称和id
+    """
     queryset = ProjectsModel.objects.all()
     serializer_class = ProjectModelSerializer
     filter_backends = [rest_framework.DjangoFilterBackend, filters.OrderingFilter]
@@ -65,13 +50,37 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
     @action(detail=False)
     def names(self, request, *args, **kwargs):
-        instance = self.get_queryset()
-
-        return Response([{'id': project.id, 'name': project.name} for project in instance])
+        return super().list(request, *args, **kwargs)
 
     @action(methods=['get'], detail=True)
     def interfaces(self, request, *args, **kwargs):
-        project = self.get_object()
-        interfaces_qs = project.interfacesmodel_set.all()
-        interfaces_data = [{'id': interface.id, 'name': interface.name} for interface in interfaces_qs]
-        return Response(interfaces_data, status=200)
+        return super().retrieve(request, *args, **kwargs)
+
+    def get_queryset(self):
+        queryset = super().get_queryset().exclude(is_delete=True)
+        return queryset
+
+    def get_serializer_class(self):
+        if self.action == 'names':
+            return ProjectNameSerializer
+        elif self.action == 'interfaces':
+            return ProjectInterfaceSerializer
+        else:
+            serializer_class = super().get_serializer_class()
+            return serializer_class
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        for item in response.data.get('results'):
+            item['interfaces'] = InterfacesModel.objects.filter(project_id=item.get('id')).count()
+            item['testsuits'] = TestsuitsModel.objects.filter(project_id=item.get('id')).count()
+            item['testcases'] = TestcasesModel.objects.filter(interface__project__id=item.get('id')).count()
+            item['configures'] = ConfiguresModel.objects.filter(interface__project__id=item.get('id')).count()
+        return response
+
+    def paginate_queryset(self, queryset):
+        if self.action == 'names':
+            return None
+        else:
+            return super().paginate_queryset(queryset)
+

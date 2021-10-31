@@ -11,7 +11,7 @@ class ProjectsModel(models.Model):
     programmer = models.CharField(verbose_name='开发人员', help_text='开发人员', max_length=50)
     publish_app = models.CharField(verbose_name='发布应用', help_text='发布应用', max_length=100)
     desc = models.TextField(verbose_name='项目描述', help_text='项目描述', max_length=200, null=True, blank=True)
-    is_valid = models.BooleanField(verbose_name='是否有效', help_text='是否删除', default=True)
+    is_valid = models.BooleanField(verbose_name='是否有效', help_text='是否有效', default=True)
     is_delete = models.BooleanField(verbose_name='是否删除', help_text='是否删除', default=False)
     create_time = models.DateTimeField(verbose_name='创建时间', help_text='创建时间', auto_now_add=True)
     update_time = models.DateTimeField(verbose_name='更新时间', help_text='创建时间', auto_now=True)
