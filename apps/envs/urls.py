@@ -7,4 +7,7 @@ from envs import views
 router = routers.DefaultRouter()
 router.register('', views.EnvViewSet)
 
+urlpatterns = []
+urlpatterns += router.urls
+
 

@@ -59,6 +59,12 @@ class InterfaceViewSet(viewsets.ModelViewSet):
             serializer_class = super().get_serializer_class()
             return serializer_class
 
+    def paginate_queryset(self, queryset):
+        if self.action == 'names':
+            return None
+        else:
+            return super().paginate_queryset(queryset)
+
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs)
         for item in response.data.get('results'):
