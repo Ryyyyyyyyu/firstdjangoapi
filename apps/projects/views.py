@@ -54,7 +54,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
     @action(methods=['get'], detail=True)
     def interfaces(self, request, *args, **kwargs):
-        return super().retrieve(request, *args, **kwargs)
+        response = super().retrieve(request, *args, **kwargs)
+        response.data = response.data.get('interfaces')
+        return response
 
     def get_queryset(self):
         queryset = super().get_queryset().exclude(is_delete=True)
