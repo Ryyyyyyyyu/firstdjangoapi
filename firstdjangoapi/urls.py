@@ -37,6 +37,7 @@ urlpatterns = [
     path('projects/', include('projects.urls')),
     path('interfaces/', include('interfaces.urls')),
     path('envs/', include('envs.urls')),
+    path('debugtalks/', include('debugtalks.urls')),
     path('user/', include('users.urls')),
 
     path('docs/', include_docs_urls(title="测试平台API文档")),
