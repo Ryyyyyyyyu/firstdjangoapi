@@ -1,6 +1,5 @@
 from rest_framework import viewsets, permissions, mixins
 from rest_framework import filters
-from rest_framework.decorators import action
 from django_filters import rest_framework
 
 from debugtalks.models import DebugtalksModel

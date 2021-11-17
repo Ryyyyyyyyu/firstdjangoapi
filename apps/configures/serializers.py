@@ -23,6 +23,7 @@ class ConfiguresModelSerializer(serializers.ModelSerializer):
                 },
                 'validators': [UniqueValidator(queryset=ConfiguresModel.objects.all(), message='配置名称重复')]
             },
+            'request': {'write_only': True},
             'create_time': {'format': '%Y-%m-%d %H:%M:%S'},
             'update_time': {'format': '%Y-%m-%d %H:%M:%S'},
         }
