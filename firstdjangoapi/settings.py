@@ -27,9 +27,14 @@ sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 SECRET_KEY = '_!1kugy!9ao$tdv0+pz2y5v8-coi1wvb^_489au@&r!$y70j)*'
 
 # SECURITY WARNING: don't run with debug turned on in production!
+# DEBUG = True
+#
+# ALLOWED_HOSTS = []
+# 关闭debug模式
 DEBUG = True
-
+# 允许所有IP访问
 ALLOWED_HOSTS = ['*']
+
 
 # Application definition
 
@@ -145,7 +150,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
+# 设置静态文件配置
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # REST_FRAMEWORK相关配置
 REST_FRAMEWORK = {

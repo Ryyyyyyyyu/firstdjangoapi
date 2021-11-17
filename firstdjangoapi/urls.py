@@ -14,10 +14,11 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path, include, re_path
+from django.views.static import serve
+from django.conf import settings
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework.documentation import include_docs_urls
-from rest_framework_jwt.views import obtain_jwt_token
 
 # swager文档
 schema_view = get_schema_view(
@@ -41,6 +42,7 @@ urlpatterns = [
     path('configure/', include('configures.urls')),
     path('user/', include('users.urls')),
 
+    re_path(r'^static/(?P<path>.*)', serve, {'document_root': settings.STATIC_ROOT}, ),
     path('docs/', include_docs_urls(title="测试平台API文档")),
     re_path(r'^swagger(?P<format>\.json|\.yaml)$',
             schema_view.without_ui(cache_timeout=0), name='schema-json'),
