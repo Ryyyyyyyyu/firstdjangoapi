@@ -2,9 +2,9 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from projects.models import ProjectsModel
-from debugtalks.models import DebugtalksModel
 from interfaces.serializers import InterfacesNameSerializer
+from debugtalks.models import DebugtalksModel
+from projects.models import ProjectsModel
 
 
 class ProjectModelSerializer(serializers.ModelSerializer):
@@ -36,6 +36,9 @@ class ProjectModelSerializer(serializers.ModelSerializer):
 
 
 class ProjectNameSerializer(serializers.ModelSerializer):
+    """
+    获取项目名称
+    """
 
     class Meta:
         model = ProjectsModel
@@ -43,6 +46,9 @@ class ProjectNameSerializer(serializers.ModelSerializer):
 
 
 class ProjectInterfaceSerializer(serializers.ModelSerializer):
+    """
+     获取项目下的所有接口名称
+    """
     interfaces = InterfacesNameSerializer(help_text='项目接口信息', label='项目接口信息', read_only=True, many=True)
 
     class Meta:

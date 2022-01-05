@@ -2,10 +2,10 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from configures.serializers import ConfiguresNameSerializer
+from testcases.serializers import TestcasesNameSerializer
 from interfaces.models import InterfacesModel
 from projects.models import ProjectsModel
-from testcases.serializers import TestcasesNameSerializer
+from configures.models import ConfiguresModel
 
 
 class InterfacesModelSerializer(serializers.ModelSerializer):
@@ -41,12 +41,27 @@ class InterfacesModelSerializer(serializers.ModelSerializer):
 
 
 class InterfacesNameSerializer(serializers.ModelSerializer):
+    """
+    获取接口名称
+    """
     class Meta:
         model = InterfacesModel
         fields = ['id', 'name']
 
 
+class ConfiguresNameSerializer(serializers.ModelSerializer):
+    """
+    获取配置信息名称
+    """
+    class Meta:
+        model = ConfiguresModel
+        fields = ['id', 'name']
+
+
 class InterfaceConfigureSerializer(serializers.ModelSerializer):
+    """
+    获取接口对应的配置信息名称
+    """
     configures = ConfiguresNameSerializer(help_text='接口配置信息', label='接口配置信息', read_only=True, many=True)
 
     class Meta:
@@ -55,8 +70,13 @@ class InterfaceConfigureSerializer(serializers.ModelSerializer):
 
 
 class InterfaceTestcaseSerializer(serializers.ModelSerializer):
+    """
+    获取接口相关的测试用例信息
+    """
     testcases = TestcasesNameSerializer(help_text='接口相关用例信息', label='接口相关用例信息', read_only=True, many=True)
 
     class Meta:
         model = InterfacesModel
         fields = ['testcases', ]
+
+

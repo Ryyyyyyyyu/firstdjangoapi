@@ -6,9 +6,28 @@ from interfaces.models import InterfacesModel
 from configures.models import ConfiguresModel
 
 
+class InterfaceProjectSerializer(serializers.ModelSerializer):
+    """
+    获取接口所属项目信息
+    """
+    project = serializers.StringRelatedField(label='所属项目名称', help_text='所属项目名称', read_only=True)
+    # pid = serializers.IntegerField()
+    # iid = serializers.IntegerField()
+
+    class Meta:
+        model = InterfacesModel
+        fields = ['name', 'project']
+        extra_kwargs = {
+            'name': {
+                'read_only': True
+            }
+        }
+
+
 class ConfiguresModelSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(help_text='配置id', label='配置id', read_only=True, validators=[
         UniqueValidator(queryset=InterfacesModel.objects.all(), message='配置id重复')])
+    interface = InterfaceProjectSerializer(help_text='配置所属接口以及项目', label='配置所属接口以及项目')
 
     class Meta:
         model = ConfiguresModel
@@ -28,8 +47,3 @@ class ConfiguresModelSerializer(serializers.ModelSerializer):
             'update_time': {'format': '%Y-%m-%d %H:%M:%S'},
         }
 
-
-class ConfiguresNameSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ConfiguresModel
-        fields = ['id', 'name']
