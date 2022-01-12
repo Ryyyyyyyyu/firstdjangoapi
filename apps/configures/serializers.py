@@ -3,7 +3,13 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 from interfaces.models import InterfacesModel
+from projects.models import ProjectsModel
 from configures.models import ConfiguresModel
+
+
+def is_exit_project_id(data):
+    if not ProjectsModel.objects.filter(id=data).exists():
+        raise serializers.ValidationError('项目id不存在')
 
 
 class InterfaceProjectSerializer(serializers.ModelSerializer):
@@ -11,17 +17,24 @@ class InterfaceProjectSerializer(serializers.ModelSerializer):
     获取接口所属项目信息
     """
     project = serializers.StringRelatedField(label='所属项目名称', help_text='所属项目名称', read_only=True)
-    # pid = serializers.IntegerField()
-    # iid = serializers.IntegerField()
+    pid = serializers.IntegerField(label='所属项目id', help_text='所属项目id', write_only=True,
+                                   validators=[])
+    iid = serializers.IntegerField(label='所属接口id', help_text='所属接口id', write_only=True)
 
     class Meta:
         model = InterfacesModel
-        fields = ['name', 'project']
+        fields = ['name', 'project', 'iid', 'pid']
         extra_kwargs = {
             'name': {
                 'read_only': True
             }
         }
+
+    # 校验项目传入的项目id和接口id是否匹配
+    def validate(self, attrs):
+        if not InterfacesModel.objects.filter(id=attrs.get('iid'), project_id=attrs.get('pid')):
+            raise serializers.ValidationError('项目和接口不对应')
+        return attrs
 
 
 class ConfiguresModelSerializer(serializers.ModelSerializer):
@@ -47,3 +60,10 @@ class ConfiguresModelSerializer(serializers.ModelSerializer):
             'update_time': {'format': '%Y-%m-%d %H:%M:%S'},
         }
 
+    # 将输入的iid和pid替换成interface_id
+    def to_internal_value(self, data):
+        result = super().to_internal_value(data)
+        iid = result.get('interface').get('iid')
+        result.pop('interface')
+        result['interface_id'] = iid
+        return result
