@@ -7,8 +7,8 @@ from projects.models import ProjectsModel
 from configures.models import ConfiguresModel
 
 
-def is_exit_project_id(data):
-    if not ProjectsModel.objects.filter(id=data).exists():
+def is_exit_project_id(value):
+    if not ProjectsModel.objects.filter(id=value).exists():
         raise serializers.ValidationError('项目id不存在')
 
 
@@ -18,7 +18,7 @@ class InterfaceProjectSerializer(serializers.ModelSerializer):
     """
     project = serializers.StringRelatedField(label='所属项目名称', help_text='所属项目名称', read_only=True)
     pid = serializers.IntegerField(label='所属项目id', help_text='所属项目id', write_only=True,
-                                   validators=[])
+                                   validators=[is_exit_project_id])
     iid = serializers.IntegerField(label='所属接口id', help_text='所属接口id', write_only=True)
 
     class Meta:

@@ -37,7 +37,18 @@ class ConfigureViewSet(viewsets.ModelViewSet):
         config_variables_list = handler_datas.handle_data2(config_variables)
 
         config_name = config_request.get('config').get('name')
-        # select_interface_id = config_instance
+        select_interface_id = config_instance.interface_id
+        select_project_id = config_instance.interface.project_id
 
-        data = {}
+        data = {
+            "config_name": config_name,
+            "author": config_instance.author,
+            "header": config_headers_list,
+            "globalVar": config_variables_list,
+            "select_interface_id": select_interface_id,
+            "select_project_id": select_project_id,
+            "is_valid": config_instance.is_valid,
+            "create_time": config_instance.create_time,
+            "update_time": config_instance.update_time
+        }
         return Response(data)
