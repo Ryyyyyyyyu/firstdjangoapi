@@ -19,7 +19,7 @@ class ConfigureViewSet(viewsets.ModelViewSet):
     filter_backends = [rest_framework.DjangoFilterBackend, filters.OrderingFilter]
     filter_class = ConfigureFilterSet
 
-    search_fields = ['id', 'name']
+    search_fields = ['id', 'name', 'is_valid']
     ordering_fields = ['id']
 
     permission_classes = [permissions.IsAuthenticated]
