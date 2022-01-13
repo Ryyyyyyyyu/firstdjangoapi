@@ -39,8 +39,9 @@ urlpatterns = [
     path('interfaces/', include('interfaces.urls')),
     path('envs/', include('envs.urls')),
     path('debugtalks/', include('debugtalks.urls')),
-    path('configure/', include('configures.urls')),
-    path('user/', include('users.urls')),
+    path('configures/', include('configures.urls')),
+    path('reports/', include('reports.urls')),
+    path('users/', include('users.urls')),
 
     re_path(r'^static/(?P<path>.*)', serve, {'document_root': settings.STATIC_ROOT}, ),
     path('docs/', include_docs_urls(title="测试平台API文档")),

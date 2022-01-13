@@ -15,7 +15,7 @@ class ReportsModelSerializer(serializers.ModelSerializer):
             'name': {
                 'required': 'True',
                 'error_messages': {
-                    'max_length': '报告名称最大为50个字符',
+                    'max_length': '报告名称最大为200个字符',
                     'min_length': '报告名称不能为空',
                     'allow_null': '报告名称不能为null'
                 },
