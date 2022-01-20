@@ -250,3 +250,6 @@ LOGGING = {
         },
     }
 }
+
+# httprunner项目路径
+PROJECT_DIR = os.path.join(BASE_DIR, 'projects_dir')

@@ -1,4 +1,6 @@
 import json
+import os
+from datetime import datetime
 
 from django_filters import rest_framework
 from rest_framework import filters
@@ -7,10 +9,13 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from firstdjangoapi import settings
 from .filters import TestcasesFilterSet
-from .serializers import TestcasesModelSerializer
+from .serializers import TestcasesModelSerializer, TestcasesRunSerializer
 from testcases.models import TestcasesModel
+from envs.models import EnvsModel
 from utils import handler_datas
+from utils import common
 
 
 class TestcaseViewSet(viewsets.ModelViewSet):
@@ -88,3 +93,32 @@ class TestcaseViewSet(viewsets.ModelViewSet):
             return Response(data)
         except Exception as e:
             return Response({"msg": f"request格式错误，{e}"})
+
+    @action(methods=['post'], detail=True)
+    def run(self, request, *args, **kwargs):
+        # 1.获取用例模型对象以及evn_id
+        instance = self.get_object()
+        serializer: TestcasesRunSerializer
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(True)
+        env_id = serializer.validated_data.get('evn_id')
+        env = EnvsModel.objects.filter(id=env_id).first()
+
+        # 2.创建以时间戳命明的目录
+        dirname = datetime.strftime(datetime.now(), '%Y%m%d%H%M%S')
+        testcase_dir_path = os.path.join(settings.PROJECT_DIR, dirname)
+        os.makedirs(testcase_dir_path)
+
+        # 3.创建以项目名命名的目录
+        # 4.生成debug.py、yaml用例文件
+        common.generate_testcase_file(instance, env, testcase_dir_path)
+
+        # 5.运行用例并生成测试报告
+        pass
+
+    def get_serializer_class(self):
+        if self.action == 'run':
+            serializer_class = TestcasesRunSerializer
+        else:
+            serializer_class = super().get_serializer_class()
+        return serializer_class
