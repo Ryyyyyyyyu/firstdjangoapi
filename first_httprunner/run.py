@@ -2,4 +2,5 @@
 from httprunner.api import HttpRunner
 
 hr = HttpRunner()
-hr.run(r'F:\pyCharm_projects\firstdjangoapi\first_httprunner\api\login_api.yml')
+summary = hr.run(r'D:\PycharmProjects\firstdjangoapi\projects_dir\20220121152032\自动化测试平台项目\登录接口_自动化测试平台项目\登录接口_正向用例.yaml')
+print(summary)
