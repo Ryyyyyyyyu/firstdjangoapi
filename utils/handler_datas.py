@@ -142,6 +142,24 @@ def handle_data6(datas):
     return data_list
 
 
+def handle_data7(datas):
+    """
+    [{'age': 18}, {'name': '马仔'}]
+    [{key: 'age', value: 18, param_type: 'int'}]
+    """
+    data_list = []
+    if datas is not None:
+        for item in datas:
+            comparator = list(item)[0]
+            content = item.get(comparator)
+            data_list.append({
+                "key": content[0],
+                "value": content[1],
+                "param_type": handle_param_type(content[1])
+            })
+    return data_list
+
+
 if __name__ == '__main__':
-    data = [{'User-Agent': 'Mozilla/5.0 KeYou'}, {'Content-Type': 'application/json;charset=UTF-8'}]
-    print(handle_data3(data))
+    data = [{"eq": ["status_code", 200]}, {"eq": ["headers.Content-Type", "application/json"]}]
+    print(handle_data7(data))
