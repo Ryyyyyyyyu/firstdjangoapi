@@ -3,17 +3,20 @@ from rest_framework import filters
 from rest_framework import permissions
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from configures.models import ConfiguresModel
 from interfaces.models import InterfacesModel
 from projects.filters import ProjectsFilterSet
 from projects.models import ProjectsModel
 from projects.serializers import ProjectModelSerializer, ProjectNameSerializer, ProjectInterfaceSerializer
+from projects.serializers import ProjectsRunSerializer
 from testcases.models import TestcasesModel
 from testsuites.models import TestsuitsModel
+from utils.base_serializers import RunMixin
 
 
-class ProjectViewSet(viewsets.ModelViewSet):
+class ProjectViewSet(RunMixin, viewsets.ModelViewSet):
     """
     list:
     获取所有项目列表数据，默认分页
@@ -58,6 +61,13 @@ class ProjectViewSet(viewsets.ModelViewSet):
         response.data = response.data.get('interfaces')
         return response
 
+    @action(methods=['post'], detail=True)
+    def run(self, request, *args, **kwargs):
+        testcase_qs = TestcasesModel.objects.filter(interface__project=self.get_object())
+        if len(testcase_qs) == 0:
+            return Response({'msg': '此项目下没有用例，无法执行！'})
+        return self.execute(qs=testcase_qs, request=request)
+
     def get_queryset(self):
         queryset = super().get_queryset().exclude(is_delete=True)
         return queryset
@@ -67,6 +77,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return ProjectNameSerializer
         elif self.action == 'interfaces':
             return ProjectInterfaceSerializer
+        elif self.action == 'run':
+            return ProjectsRunSerializer
         else:
             serializer_class = super().get_serializer_class()
             return serializer_class

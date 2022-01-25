@@ -6,6 +6,7 @@ from django_filters import rest_framework
 
 # Create your views here.
 from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from configures.models import ConfiguresModel
 from interfaces.filters import InterfacesFilterSet
@@ -13,9 +14,11 @@ from interfaces.models import InterfacesModel
 from interfaces.serializers import InterfacesModelSerializer, InterfacesNameSerializer, InterfaceConfigureSerializer, \
     InterfaceTestcaseSerializer
 from testcases.models import TestcasesModel
+from interfaces.serializers import InterfacesRunSerializer
+from utils.base_serializers import RunMixin
 
 
-class InterfaceViewSet(viewsets.ModelViewSet):
+class InterfaceViewSet(RunMixin, viewsets.ModelViewSet):
     queryset = InterfacesModel.objects.all()
     serializer_class = InterfacesModelSerializer
 
@@ -44,6 +47,14 @@ class InterfaceViewSet(viewsets.ModelViewSet):
         response.data = response.data.get('testcases')
         return response
 
+    @action(methods=['post'], detail=True)
+    def run(self, request, *args, **kwargs):
+        testcase_qs = TestcasesModel.objects.filter(interface=self.get_object())
+        # testcase_qs = self.get_object().testcases.all()
+        if len(testcase_qs) == 0:
+            return Response({'msg': '此接口下没有用例，无法执行！'})
+        return self.execute(qs=testcase_qs, request=request)
+
     def get_queryset(self):
         queryset = super().get_queryset().exclude(is_delete=True)
         return queryset
@@ -55,6 +66,8 @@ class InterfaceViewSet(viewsets.ModelViewSet):
             return InterfaceConfigureSerializer
         elif self.action == 'testcases':
             return InterfaceTestcaseSerializer
+        elif self.action == 'run':
+            return InterfacesRunSerializer
         else:
             serializer_class = super().get_serializer_class()
             return serializer_class
