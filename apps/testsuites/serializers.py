@@ -25,3 +25,12 @@ class TestsuitsModelSerializer(serializers.ModelSerializer):
             'create_time': {'format': '%Y-%m-%d %H:%M:%S'},
             'update_time': {'format': '%Y-%m-%d %H:%M:%S'}
         }
+
+
+class TestsuitsRunSerializer(serializers.ModelSerializer):
+    evn_id = serializers.IntegerField(help_text='所属环境id', label='所属环境id',
+                                      validators=[])
+
+    class Meta:
+        model = TestsuitsModel
+        fields = ['id', 'evn_id']
