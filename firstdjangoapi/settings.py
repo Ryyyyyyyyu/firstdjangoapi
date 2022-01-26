@@ -31,7 +31,7 @@ SECRET_KEY = '_!1kugy!9ao$tdv0+pz2y5v8-coi1wvb^_489au@&r!$y70j)*'
 #
 # ALLOWED_HOSTS = []
 # 关闭debug模式
-DEBUG = True
+DEBUG = False
 # 允许所有IP访问
 ALLOWED_HOSTS = ['*']
 
@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'reports',
     'debugtalks',
     'envs',
+    'summary'
 ]
 
 MIDDLEWARE = [
@@ -243,7 +244,7 @@ LOGGING = {
     # 定义日志器
     'loggers': {
         # 指定日志器的名称
-        'dev07': {  # 定义了一个名为mytest的日志器
+        'mytest': {  # 定义了一个名为mytest的日志器
             'handlers': ['console', 'file'],
             'propagate': True,
             'level': 'DEBUG',  # 日志器接收的最低日志级别

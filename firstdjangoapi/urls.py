@@ -43,6 +43,7 @@ urlpatterns = [
     path('reports/', include('reports.urls')),
     path('testcases/', include('testcases.urls')),
     path('testsuites/', include('testsuites.urls')),
+    path('summary/', include('summary.urls')),
     path('user/', include('users.urls')),
 
     re_path(r'^static/(?P<path>.*)', serve, {'document_root': settings.STATIC_ROOT}, ),

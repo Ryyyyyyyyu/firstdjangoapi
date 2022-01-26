@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 from datetime import datetime
 
@@ -13,6 +14,9 @@ from debugtalks.models import DebugtalksModel
 from envs.models import EnvsModel
 from configures.models import ConfiguresModel
 from reports.models import ReportsModel
+
+
+logger = logging.getLogger('mytest')
 
 
 def generate_testcase_file(instance: TestcasesModel, env: EnvsModel, testcase_dir_path):
