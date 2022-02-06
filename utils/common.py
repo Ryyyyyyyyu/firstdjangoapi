@@ -95,7 +95,7 @@ def run_testcase(instance: TestcasesModel, testcase_dir_path):
         return Response({'msg': '用例执行失败', 'status': 1})
 
     report_id = create_report(hr, instance)
-    return Response({'id': report_id})
+    return Response({'id': report_id, 'msg': '执行成功，详情见测试报告'})
 
 
 def create_report(runner: HttpRunner, instance: TestcasesModel):

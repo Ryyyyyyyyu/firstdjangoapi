@@ -57,9 +57,9 @@ class ProjectInterfaceSerializer(serializers.ModelSerializer):
 
 
 class ProjectsRunSerializer(serializers.ModelSerializer):
-    evn_id = serializers.IntegerField(help_text='所属环境id', label='所属环境id',
+    env_id = serializers.IntegerField(help_text='所属环境id', label='所属环境id',
                                       validators=[])
 
     class Meta:
         model = ProjectsModel
-        fields = ['id', 'evn_id']
+        fields = ['id', 'env_id']

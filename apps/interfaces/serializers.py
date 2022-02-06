@@ -81,10 +81,10 @@ class InterfaceTestcaseSerializer(serializers.ModelSerializer):
 
 
 class InterfacesRunSerializer(serializers.ModelSerializer):
-    evn_id = serializers.IntegerField(help_text='所属环境id', label='所属环境id',
+    env_id = serializers.IntegerField(help_text='所属环境id', label='所属环境id',
                                       validators=[])
 
     class Meta:
         model = InterfacesModel
-        fields = ['id', 'evn_id']
+        fields = ['id', 'env_id']
 

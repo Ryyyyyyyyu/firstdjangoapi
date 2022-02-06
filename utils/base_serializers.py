@@ -18,7 +18,7 @@ class RunMixin:
             return Response({'msg': '测试用例数据不可迭代，请检查qs数据，用例执行失败'})
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        env_id = serializer.validated_data.get('evn_id')
+        env_id = serializer.validated_data.get('env_id')
         env = EnvsModel.objects.filter(id=env_id).first()
 
         # 2.创建以时间戳命明的目录
