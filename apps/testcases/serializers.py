@@ -44,9 +44,9 @@ class TestcasesNameSerializer(serializers.ModelSerializer):
 
 
 class TestcasesRunSerializer(serializers.ModelSerializer):
-    evn_id = serializers.IntegerField(help_text='所属环境id', label='所属环境id',
+    env_id = serializers.IntegerField(help_text='所属环境id', label='所属环境id',
                                       validators=[])
 
     class Meta:
         model = TestcasesModel
-        fields = ['id', 'evn_id']
+        fields = ['id', 'env_id']

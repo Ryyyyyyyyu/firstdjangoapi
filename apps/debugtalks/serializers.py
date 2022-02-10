@@ -23,6 +23,8 @@ class DebugtalksModelSerializer(serializers.ModelSerializer):
 
 
 class DebugtalksContextSerializer(serializers.ModelSerializer):
+    project = serializers.StringRelatedField(label='所属项目名称', help_text='所属项目名称', read_only=True)
+
     class Meta:
         model = DebugtalksModel
-        fields = ['id', 'debugtalk']
+        fields = ['id', 'project', 'debugtalk']
